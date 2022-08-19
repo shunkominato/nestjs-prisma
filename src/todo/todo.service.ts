@@ -17,6 +17,7 @@ export class TodoService {
         createdAt: 'desc',
       },
     });
+    console.log(todo);
     return todo;
   }
 
