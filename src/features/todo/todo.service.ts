@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Task } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/features/prisma/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 
@@ -46,19 +46,14 @@ export class TodoService {
     }
   }
 
-  async updateTaskById(
-    userId: number,
-    taskId: number,
-    dto: UpdateTaskDto,
-  ): Promise<Task> {
+  async updateTaskById(userId: number, taskId: number, dto: UpdateTaskDto): Promise<Task> {
     const task = await this.prisma.task.findUnique({
       where: {
         id: taskId,
       },
     });
 
-    if (!task || task.userId !== userId)
-      throw new ForbiddenException('No permision to update');
+    if (!task || task.userId !== userId) throw new ForbiddenException('No permision to update');
 
     return this.prisma.task.update({
       where: {
@@ -77,8 +72,7 @@ export class TodoService {
       },
     });
 
-    if (!task || task.userId !== userId)
-      throw new ForbiddenException('No permision to delete');
+    if (!task || task.userId !== userId) throw new ForbiddenException('No permision to delete');
 
     await this.prisma.task.delete({
       where: {
