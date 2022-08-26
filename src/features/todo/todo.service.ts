@@ -46,14 +46,19 @@ export class TodoService {
     }
   }
 
-  async updateTaskById(userId: number, taskId: number, dto: UpdateTaskDto): Promise<Task> {
+  async updateTaskById(
+    userId: number,
+    taskId: number,
+    dto: UpdateTaskDto
+  ): Promise<Task> {
     const task = await this.prisma.task.findUnique({
       where: {
         id: taskId,
       },
     });
 
-    if (!task || task.userId !== userId) throw new ForbiddenException('No permision to update');
+    if (!task || task.userId !== userId)
+      throw new ForbiddenException('No permision to update');
 
     return this.prisma.task.update({
       where: {
@@ -72,7 +77,8 @@ export class TodoService {
       },
     });
 
-    if (!task || task.userId !== userId) throw new ForbiddenException('No permision to delete');
+    if (!task || task.userId !== userId)
+      throw new ForbiddenException('No permision to delete');
 
     await this.prisma.task.delete({
       where: {

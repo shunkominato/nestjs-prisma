@@ -30,7 +30,10 @@ export class TodoController {
   }
 
   @Get(':id')
-  getTaskById(@Req() req: Request, @Param('id', ParseIntPipe) taskId: number): Promise<Task> {
+  getTaskById(
+    @Req() req: Request,
+    @Param('id', ParseIntPipe) taskId: number
+  ): Promise<Task> {
     return this.todoService.getTaskById(req.user.id, taskId);
   }
 
@@ -52,7 +55,10 @@ export class TodoController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  deleteTaskById(@Req() req: Request, @Param('id', ParseIntPipe) taskId: number): Promise<void> {
+  deleteTaskById(
+    @Req() req: Request,
+    @Param('id', ParseIntPipe) taskId: number
+  ): Promise<void> {
     return this.todoService.deleteTaskById(req.user.id, taskId);
   }
 }

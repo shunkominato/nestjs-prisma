@@ -16,7 +16,10 @@ export class UserController {
   }
 
   @Patch()
-  updateUser(@Req() req: Request, @Body() dto: UpdateUserDto): Promise<Omit<User, 'hashedPassword'>> {
+  updateUser(
+    @Req() req: Request,
+    @Body() dto: UpdateUserDto
+  ): Promise<Omit<User, 'hashedPassword'>> {
     return this.userService.updateUser(req.user.id, dto);
   }
 }
