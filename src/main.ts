@@ -10,10 +10,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.enableCors({
     credentials: true,
-    origin: [
-      'http://127.0.0.1:3000',
-      'https://frontend-todo-nextjs.vercel.app',
-    ],
+    origin: ['http://127.0.0.1:3000', 'https://frontend-todo-nextjs.vercel.app'],
   });
   app.use(cookieParser());
   app.use(
@@ -26,7 +23,7 @@ async function bootstrap() {
       value: (req: Request) => {
         return req.header('csrf-token');
       },
-    }),
+    })
   );
   await app.listen(process.env.PORT || 3005);
 }
