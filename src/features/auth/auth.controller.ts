@@ -8,7 +8,7 @@ import {
   Req,
   Get,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { FastifyRequest, FastifyReply } from 'fastify';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { Csrf, Msg } from './interfaces/auth.interface';
@@ -17,9 +17,8 @@ import { Csrf, Msg } from './interfaces/auth.interface';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Get('/csrf')
-  getCsrfToken(@Req() req: Request): Csrf {
-    console.log('dsfa');
-    return { csrfToken: req.csrfToken() };
+  getCsrfToken(@Res({ passthrough: true }) res: FastifyReply) {
+    return { csrfToken: res.generateCsrf() };
   }
 
   @Post('signup')
@@ -31,7 +30,7 @@ export class AuthController {
   @Post('login')
   async login(
     @Body() dto: AuthDto,
-    @Res({ passthrough: true }) res: Response
+    @Res({ passthrough: true }) res: FastifyReply
   ): Promise<Msg> {
     const jwt = await this.authService.login(dto);
     res.cookie('access_token', jwt.accessToken, {
@@ -47,7 +46,10 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('/logout')
-  logout(@Req() req: Request, @Res({ passthrough: true }) res: Response): Msg {
+  logout(
+    @Req() req: FastifyRequest,
+    @Res({ passthrough: true }) res: FastifyReply
+  ): Msg {
     res.cookie('access_token', '', {
       httpOnly: true,
       secure: true,

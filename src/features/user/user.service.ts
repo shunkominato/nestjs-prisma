@@ -11,8 +11,6 @@ export class UserService {
     userId: number,
     dto: UpdateUserDto
   ): Promise<Omit<User, 'hashedPassword'>> {
-    console.log(userId);
-    console.log(dto);
     const user = await this.prisma.user.update({
       where: {
         id: userId,

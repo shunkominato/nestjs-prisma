@@ -12,9 +12,10 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { FastifyRequest } from 'fastify';
 import { AuthGuard } from '@nestjs/passport';
 import { Task } from '@prisma/client';
-import { Request } from 'express';
+// import { Request } from 'express';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TodoService } from './todo.service';
@@ -25,28 +26,29 @@ export class TodoController {
   constructor(private readonly todoService: TodoService) {}
 
   @Get()
-  getTasks(@Req() req: Request): Promise<Task[]> {
+  getTasks(@Req() req: FastifyRequest): Promise<Task[]> {
     return this.todoService.getTasks(req.user.id);
   }
 
   @Get(':id')
   getTaskById(
-    @Req() req: Request,
+    @Req() req: FastifyRequest,
     @Param('id', ParseIntPipe) taskId: number
   ): Promise<Task> {
     return this.todoService.getTaskById(req.user.id, taskId);
   }
 
   @Post()
-  createTask(@Req() req: Request, @Body() dto: CreateTaskDto): Promise<Task> {
-    console.log(req.user);
-    console.log(dto);
+  createTask(
+    @Req() req: FastifyRequest,
+    @Body() dto: CreateTaskDto
+  ): Promise<Task> {
     return this.todoService.createTodo(req.user.id, dto);
   }
 
   @Patch(':id')
   updateTaskById(
-    @Req() req: Request,
+    @Req() req: FastifyRequest,
     @Param('id', ParseIntPipe) taskId: number,
     @Body() dto: UpdateTaskDto
   ): Promise<Task> {
@@ -56,7 +58,7 @@ export class TodoController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   deleteTaskById(
-    @Req() req: Request,
+    @Req() req: FastifyRequest,
     @Param('id', ParseIntPipe) taskId: number
   ): Promise<void> {
     return this.todoService.deleteTaskById(req.user.id, taskId);
