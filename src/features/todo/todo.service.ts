@@ -1,6 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Task } from '@prisma/client';
-import { PrismaService } from 'src/features/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
+// import { PrismaService } from 'src/features/prisma/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 
