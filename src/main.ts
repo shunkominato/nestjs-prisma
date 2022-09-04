@@ -4,9 +4,20 @@ import { ValidationPipe } from '@nestjs/common';
 import { Request } from 'express';
 import * as cookieParser from 'cookie-parser';
 import * as csurf from 'csurf';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const config = new DocumentBuilder()
+    .setTitle('Sample REST API')
+    .setDescription('REST API Tutorial in NestJS')
+    .setVersion('0.1')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.enableCors({
     credentials: true,
