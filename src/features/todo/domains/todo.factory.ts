@@ -1,6 +1,7 @@
 import { Task } from '@prisma/client';
 import { plainToClass } from 'class-transformer';
 import { CreateTaskDto } from '../dto/create-task.dto';
+import { UpdateTaskDto } from '../dto/update-task.dto';
 import { todoReadModel } from './todo.read.model';
 import { todoWriteModel } from './todo.write.model';
 
@@ -15,6 +16,19 @@ export const getFactory = (todo: Task) => {
 
 export const createFactory = (userId: number, dto: CreateTaskDto) => {
   return plainToClass(todoWriteModel, {
+    title: dto.title,
+    description: dto.description,
+    userId,
+  });
+};
+
+export const updateFactory = (
+  id: number,
+  userId: number,
+  dto: UpdateTaskDto
+) => {
+  return plainToClass(todoWriteModel, {
+    id,
     title: dto.title,
     description: dto.description,
     userId,

@@ -7,7 +7,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 // import { ITodoRepository } from './infrastructures/todo.repository';
 import { ConstantTokens } from './todo.constants';
-import { createFactory } from './domains/todo.factory';
+import { createFactory, updateFactory } from './domains/todo.factory';
 
 @Injectable()
 export class TodoService {
@@ -47,7 +47,7 @@ export class TodoService {
     if (!task || task.userId !== userId)
       throw new ForbiddenException('No permision to update');
 
-    const todoWriteModel = createFactory(userId, dto);
+    const todoWriteModel = updateFactory(task.id, userId, dto);
     try {
       const todo = await todoWriteModel.updateTodo(this.todoRepository);
       return todo;
