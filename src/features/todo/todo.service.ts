@@ -1,47 +1,37 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import { Task } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { ITodoRepository } from './infrastructures/todo.repository';
 // import { PrismaService } from 'src/features/prisma/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+// import { ITodoRepository } from './infrastructures/todo.repository';
+import { ConstantTokens } from './todo.constants';
+import { createFactory } from './domains/todo.factory';
 
 @Injectable()
 export class TodoService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    @Inject(ConstantTokens.REPOSITORY)
+    private readonly todoRepository: ITodoRepository
+  ) {}
 
   async getTasks(userId: number): Promise<Task[]> {
-    const todo = await this.prisma.task.findMany({
-      where: {
-        userId,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    const todo = await this.todoRepository.getTasks(userId);
     console.log(todo);
     return todo;
   }
 
   async getTaskById(userId: number, taskId: number): Promise<Task> {
-    const todo = await this.prisma.task.findFirst({
-      where: {
-        userId,
-        id: taskId,
-      },
-    });
+    const todo = await this.todoRepository.getTaskById(userId, taskId);
     return todo;
   }
 
   async createTodo(userId: number, dto: CreateTaskDto): Promise<Task> {
+    const todoWriteModel = createFactory(userId, dto);
     try {
-      const task = await this.prisma.task.create({
-        data: {
-          userId,
-          title: dto.title,
-          description: dto.description,
-        },
-      });
-      return task;
+      const todo = await todoWriteModel.createTodo(this.todoRepository);
+      return todo;
     } catch (err) {
       console.log(err);
     }
@@ -52,39 +42,31 @@ export class TodoService {
     taskId: number,
     dto: UpdateTaskDto
   ): Promise<Task> {
-    const task = await this.prisma.task.findUnique({
-      where: {
-        id: taskId,
-      },
-    });
+    const task = await this.todoRepository.getTaskById(userId, taskId);
 
     if (!task || task.userId !== userId)
       throw new ForbiddenException('No permision to update');
 
-    return this.prisma.task.update({
-      where: {
-        id: taskId,
-      },
-      data: {
-        ...dto,
-      },
-    });
+    const todoWriteModel = createFactory(userId, dto);
+    try {
+      const todo = await todoWriteModel.updateTodo(this.todoRepository);
+      return todo;
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async deleteTaskById(userId: number, taskId: number): Promise<void> {
-    const task = await this.prisma.task.findUnique({
-      where: {
-        id: taskId,
-      },
-    });
+    const task = await this.todoRepository.getTaskById(userId, taskId);
 
     if (!task || task.userId !== userId)
       throw new ForbiddenException('No permision to delete');
 
-    await this.prisma.task.delete({
-      where: {
-        id: taskId,
-      },
-    });
+    try {
+      const todo = await this.todoRepository.deleteTaskById(task.id);
+      return todo;
+    } catch (err) {
+      console.log(err);
+    }
   }
 }

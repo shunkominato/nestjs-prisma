@@ -4,9 +4,11 @@ import { Request } from 'express';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from '@prisma/client';
+import { ApiTags } from '@nestjs/swagger';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('user')
+@ApiTags('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
