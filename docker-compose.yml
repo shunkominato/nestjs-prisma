@@ -4,8 +4,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - 3005:3005
+    # ports:
+    #   - 3005:3005
     restart: always
     volumes:
       - ./src:/app/src
@@ -13,7 +13,6 @@ services:
       - db
   nginx:
     image: nginx:1.23.1-alpine
-    container_name: next-nginx
     ports:
       - '80:80'
     depends_on:
@@ -24,11 +23,10 @@ services:
       - 'api'
   db:
     image: postgres:14.4-alpine
-    container_name: postgres
     ports:
       - 5434:5432
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     restart: always
