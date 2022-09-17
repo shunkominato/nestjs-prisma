@@ -5,6 +5,9 @@ import { Request } from 'express';
 import * as cookieParser from 'cookie-parser';
 import * as csurf from 'csurf';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { HttpExceptionFilter } from './app/globalFilters/httpException.filter';
+import { LogService } from './service/logger/log.service';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -19,6 +22,11 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+
+  const configService = app.get<ConfigService>(ConfigService);
+  const logService = app.get<LogService>(LogService);
+
+  app.useGlobalFilters(new HttpExceptionFilter(configService, logService));
   app.enableCors({
     credentials: true,
     origin: [
