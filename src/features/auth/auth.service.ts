@@ -1,10 +1,15 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 // import { PrismaService } from 'src/features/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../service/prisma/prisma.service';
 import { AuthDto } from './dto/auth.dto';
 import { Jwt, Msg } from './interfaces/auth.interface';
 
@@ -30,6 +35,9 @@ export class AuthService {
       };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
+        console.log('::::::::::::::');
+        console.log(error);
+        console.log('::::::::::::::');
         if (error.code === 'P2002') {
           throw new ForbiddenException('This email is already taken');
         }
@@ -39,11 +47,26 @@ export class AuthService {
   }
 
   async login(dto: AuthDto): Promise<Jwt> {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        email: dto.email,
-      },
-    });
+    const user = await this.prisma.user
+      .findUnique({
+        where: {
+          email: dto.email,
+        },
+      })
+      .catch((error) => {
+        console.log('::::::::::::::');
+        console.log(error);
+        console.log('::::::::::::::');
+        throw new HttpException(
+          {
+            errorMessage: 'error',
+            logLevel: 'fatal',
+            logMessage: 'slack',
+          },
+          // 'err',
+          HttpStatus.FORBIDDEN
+        );
+      });
     if (!user) throw new ForbiddenException('Email or password incorrect');
     const isValid = await bcrypt.compare(dto.password, user.hashedPassword);
     if (!isValid) throw new ForbiddenException('Email or password incorrect');
