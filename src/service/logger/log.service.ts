@@ -1,57 +1,56 @@
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-type SlackChannel = {
-  DEV_LOG: 'dev-log';
-  INFO: 'info';
-  WARN: 'warn';
-  ERROR: 'error';
-  FATAL: 'fatal';
-};
+export const LOG_LEVEL = {
+  DEV_LOG: 'dev-log',
+  INFO: 'info',
+  WARN: 'warn',
+  ERROR: 'error',
+  FATAL: 'fatal',
+} as const;
 
 @Injectable()
 export class LogService implements LoggerService {
   constructor(private config: ConfigService) {}
 
-  private CHANNEL: {
-    DEV_LOG: 'dev-log';
-    INFO: 'info';
-    WARN: 'warn';
-    ERROR: 'error';
-    FATAL: 'fatal';
-  };
-
   log({ message }: { message: string }) {
-    this.send({ message, channel: this.CHANNEL.INFO });
+    this.send({ message, channel: LOG_LEVEL.INFO });
   }
 
   info({ message }: { message: string }) {
-    this.send({ message, channel: this.CHANNEL.INFO });
+    this.send({ message, channel: LOG_LEVEL.INFO });
   }
 
-  warn = ({ message }: { message: string }) =>
-    this.send({ message, channel: this.CHANNEL.WARN });
+  warn({ message }: { message: string }) {
+    this.send({ message, channel: LOG_LEVEL.WARN });
+  }
 
-  error = ({ message }: { message: string }) =>
-    this.send({ message, channel: this.CHANNEL.ERROR });
+  error({ message }: { message: string }) {
+    this.send({ message, channel: LOG_LEVEL.ERROR });
+  }
 
-  fatal = ({ message }: { message: string }) =>
-    this.send({ message, channel: this.CHANNEL.FATAL });
+  fatal({ message }: { message: string }) {
+    this.send({ message, channel: LOG_LEVEL.FATAL });
+  }
 
   async send({
     message,
-    channel: originalChannel = this.CHANNEL.INFO,
+    channel: originalChannel = LOG_LEVEL.INFO,
   }: {
     message: string;
-    channel?: SlackChannel[keyof SlackChannel];
+    channel?: typeof LOG_LEVEL[keyof typeof LOG_LEVEL];
   }) {
-    const channel = originalChannel;
+    let channel = originalChannel;
+    console.log('-----looger----');
     console.log(message);
     console.log(channel);
-    console.log(this.config.get('DATABASE_URL'));
+    console.log(this.config.get('IS_PRODUCTION'));
 
+    if (!this.config.get('IS_PRODUCTION')) {
+      channel = LOG_LEVEL.DEV_LOG;
+    }
     // if (!const secret = env("IS_PRODUCTION")) {
-    //   channel = this.CHANNEL.DEV_LOG;
+    //   channel = LOG_LEVEL.DEV_LOG;
     //   header = `${header}[${originalChannel}]`;
     // }
 

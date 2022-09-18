@@ -39,9 +39,9 @@ export class TodoController {
 
   @Post()
   createTask(@Req() req: Request, @Body() dto: CreateTaskDto): Promise<Task> {
-    console.log(req.user);
-    console.log(dto);
-    return this.todoService.createTodo(req.user.id, dto);
+    const todo = this.todoService.createTodo(req.user.id, dto);
+    console.log(todo);
+    return todo;
   }
 
   @Patch(':id')

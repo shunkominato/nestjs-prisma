@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 // import { PrismaService } from 'src/features/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { makeErrorLogMessage } from 'src/lib/util/makeLogMessage';
 import { PrismaService } from '../../service/prisma/prisma.service';
 import { AuthDto } from './dto/auth.dto';
 import { Jwt, Msg } from './interfaces/auth.interface';
@@ -53,17 +54,16 @@ export class AuthService {
           email: dto.email,
         },
       })
-      .catch((error) => {
-        console.log('::::::::::::::');
-        console.log(error);
-        console.log('::::::::::::::');
+      .catch((error: PrismaClientKnownRequestError | Error) => {
+        const useCase = 'login';
+        const logMessage = makeErrorLogMessage({ error, useCase });
         throw new HttpException(
           {
-            errorMessage: 'error',
+            errorMessage: '予期せぬエラーが発生しました',
             logLevel: 'fatal',
-            logMessage: 'slack',
+            logMessage,
+            error,
           },
-          // 'err',
           HttpStatus.FORBIDDEN
         );
       });

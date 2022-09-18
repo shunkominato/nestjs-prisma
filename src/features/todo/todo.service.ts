@@ -1,6 +1,12 @@
-import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Inject,
+  Injectable,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { Task } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../service/prisma/prisma.service';
 import { ITodoRepository } from './infrastructures/todo.repository';
 // import { PrismaService } from 'src/features/prisma/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -29,11 +35,27 @@ export class TodoService {
 
   async createTodo(userId: number, dto: CreateTaskDto): Promise<Task> {
     const todoWriteModel = createFactory(userId, dto);
+    throw new HttpException(
+      {
+        errorMessage: 'error',
+        logLevel: 'fatal',
+        logMessage: 'slack',
+      },
+      // 'err',
+      HttpStatus.FORBIDDEN
+    );
+    // throw new ForbiddenException('adskjhfkjldsfkj');
     try {
       const todo = await todoWriteModel.createTodo(this.todoRepository);
       return todo;
     } catch (err) {
-      console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: `create error`,
+        },
+        404
+      );
     }
   }
 

@@ -1,6 +1,11 @@
 import { Task } from '@prisma/client';
 import { ITodoRepository } from '../infrastructures/todo.repository';
+function sleep(waitMsec: number) {
+  const startMsec = new Date() as any;
 
+  // 指定ミリ秒間だけループさせる（CPUは常にビジー状態）
+  while ((new Date() as any) - startMsec < waitMsec);
+}
 export class todoWriteModel {
   id: number;
 
