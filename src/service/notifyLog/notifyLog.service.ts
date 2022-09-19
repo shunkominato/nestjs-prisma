@@ -10,7 +10,7 @@ export const LOG_LEVEL = {
 } as const;
 
 @Injectable()
-export class LogService implements LoggerService {
+export class NotifyLogService implements LoggerService {
   constructor(private config: ConfigService) {}
 
   log({ message }: { message: string }) {
