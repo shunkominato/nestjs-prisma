@@ -6,7 +6,7 @@ import * as cookieParser from 'cookie-parser';
 import * as csurf from 'csurf';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { HttpExceptionFilter } from './app/globalFilters/httpException.filter';
-import { LogService } from './service/logger/log.service';
+import { NotifyLogService } from './service/notifyLog/notifyLog.service';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
@@ -24,7 +24,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   const configService = app.get<ConfigService>(ConfigService);
-  const logService = app.get<LogService>(LogService);
+  const logService = app.get<NotifyLogService>(NotifyLogService);
 
   app.useGlobalFilters(new HttpExceptionFilter(configService, logService));
   app.enableCors({
