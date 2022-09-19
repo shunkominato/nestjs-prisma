@@ -9,3 +9,4 @@ dist/
 node_modules/
 docker-compose.yml
 Dockerfile
+yarn-error.log

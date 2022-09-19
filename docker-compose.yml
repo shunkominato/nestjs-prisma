@@ -9,6 +9,7 @@ services:
     restart: always
     volumes:
       - ./src:/app/src
+      # - ./node_modules:/app/node_modules
     depends_on:
       - db
   nginx:

@@ -4,10 +4,12 @@ WORKDIR /app
 
 COPY package*.json ./
 
-# RUN apk add --no-cache make gcc g++ python && \
+COPY yarn.lock ./
+
+# RUN apk add --no-cache make gcc g++ python3 && \
 #   yarn install && \
-#   yarn install --force bcrypt --build-from-source && \
-#   apk del make gcc g++ python
+#   yarn add --force bcrypt --build-from-source && \
+#   apk del make gcc g++ python3
 
 RUN yarn install
 
